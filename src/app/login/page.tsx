@@ -9,19 +9,31 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import { signIn } from "next-auth/react";
 
 import { LoginForm } from "./login.interface";
 
 import cn from "./login.module.scss";
 
 const Login: React.FC = () => {
+  const [loading, setLoading] = React.useState<boolean>(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginForm>();
 
-  const onSubmit: SubmitHandler<LoginForm> = (data: LoginForm) => {};
+  const onSubmit: SubmitHandler<LoginForm> = async (data: LoginForm) => {
+    setLoading(true);
+    const result = await signIn("credentials", {
+      username: data.username,
+      password: data.password,
+      redirect: true,
+      callbackUrl: "/content",
+    });
+    setLoading(false);
+  };
 
   return (
     <Container className={cn.loginContainer}>
@@ -49,7 +61,11 @@ const Login: React.FC = () => {
           </CardContent>
           <CardActions className={cn.loginCardAction}>
             <Button variant="contained" color="primary" type="submit">
-              Login
+              {loading ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                "Login"
+              )}
             </Button>
           </CardActions>
         </form>

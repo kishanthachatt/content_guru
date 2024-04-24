@@ -1,5 +1,5 @@
-import { signJwtAccessToken } from "@/lib/jwt";
-import prisma from "@/lib/prisma";
+import { signJwtAccessToken } from "../../../../lib/jwt";
+import prisma from "../../../../lib/prisma";
 import * as bcrypt from "bcrypt";
 
 interface RequestBody {
@@ -8,14 +8,17 @@ interface RequestBody {
 }
 export async function POST(request: Request) {
   const body: RequestBody = await request.json();
+  console.log(body);
 
   const user = await prisma.user.findFirst({
     where: {
-      email: body.username,
+      username: body.username,
     },
   });
 
-  if (user && (await bcrypt.compare(body.password, user.password))) {
+  console.log(user);
+
+  if (user && body.password === user.password) {
     const { password, ...userWithoutPass } = user;
     const accessToken = signJwtAccessToken(userWithoutPass);
     const result = {

@@ -5,6 +5,7 @@ import theme from "../theme";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "../components/Header";
+import Providers from "@/components/Providers/Providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,12 +23,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AppRouterCacheProvider>
-          <ThemeProvider theme={theme}>
-            {isAuthanticated && <Header />}
-            {children}
-          </ThemeProvider>
-        </AppRouterCacheProvider>
+        <Providers>
+          <AppRouterCacheProvider>
+            <ThemeProvider theme={theme}>
+              {isAuthanticated && <Header />}
+              {children}
+            </ThemeProvider>
+          </AppRouterCacheProvider>
+        </Providers>
       </body>
     </html>
   );
