@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import Container from "@mui/material/Container";
 import Card from "@mui/material/Card";
@@ -11,16 +11,25 @@ import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import { signIn } from "next-auth/react";
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
-import { GET } from "../api/auth/[...nextauth]/route";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 import { LoginForm } from "./login.interface";
 
 import cn from "./login.module.scss";
 
-const Login: React.FC = async () => {
+const Login: React.FC = () => {
+  const { data: session } = useSession();
+  const router = useRouter();
+
   const [loading, setLoading] = React.useState<boolean>(false);
+
+  useEffect(() => {
+    if (session && session.user) {
+      router.push("/content");
+    }
+  }, [session, router]);
+
   const {
     register,
     handleSubmit,
@@ -37,10 +46,6 @@ const Login: React.FC = async () => {
     });
     setLoading(false);
   };
-
-  const session = await getServerSession(GET);
-
-  if (session) redirect("/content");
 
   return (
     <Container className={cn.loginContainer}>
