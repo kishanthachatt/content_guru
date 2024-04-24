@@ -11,12 +11,15 @@ import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import { signIn } from "next-auth/react";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { GET } from "../api/auth/[...nextauth]/route";
 
 import { LoginForm } from "./login.interface";
 
 import cn from "./login.module.scss";
 
-const Login: React.FC = () => {
+const Login: React.FC = async () => {
   const [loading, setLoading] = React.useState<boolean>(false);
   const {
     register,
@@ -34,6 +37,10 @@ const Login: React.FC = () => {
     });
     setLoading(false);
   };
+
+  const session = await getServerSession(GET);
+
+  if (session) redirect("/content");
 
   return (
     <Container className={cn.loginContainer}>
