@@ -1,0 +1,29 @@
+@import "../../styles/all.modules";
+
+.loginContainer {
+  display: flex !important;
+  background-image: url("../../../public/loginContainerImage.jpg");
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  max-width: 100% !important;
+  justify-content: center;
+  align-items: center;
+  .loginCard > form {
+    padding: 18px;
+    width: fit-content;
+    > div {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+    }
+    .loginCardAction {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      padding: 0px 30px;
+    }
+  }
+}

@@ -1,0 +1,9 @@
+@import "../../styles/all.modules";
+
+.header {
+  display: flex;
+  align-items: center;
+  height: 72px;
+  padding: 0px 32px;
+  background-color: $color-primary-blue;
+}
