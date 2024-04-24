@@ -1,6 +1,6 @@
 import { signJwtAccessToken } from "../../../../lib/jwt";
-import prisma from "../../../../lib/prisma";
-import * as bcrypt from "bcrypt";
+import { connectMongoDB } from "../../../../lib/mongodb";
+import User from "../../../../models/user";
 
 interface RequestBody {
   username: string;
@@ -10,21 +10,32 @@ export async function POST(request: Request) {
   const body: RequestBody = await request.json();
   console.log(body);
 
-  const user = await prisma.user.findFirst({
-    where: {
-      username: body.username,
-    },
-  });
+  try {
+    await connectMongoDB();
+    const { username, password } = body;
 
-  console.log(user);
+    const user = await User.findOne({ username });
+    console.log("working", user);
 
-  if (user && body.password === user.password) {
-    const { password, ...userWithoutPass } = user;
-    const accessToken = signJwtAccessToken(userWithoutPass);
-    const result = {
-      ...userWithoutPass,
-      accessToken,
-    };
-    return new Response(JSON.stringify(result));
-  } else return new Response(JSON.stringify(null));
+    if (user) {
+      const passwordsMatch = password === user.password;
+
+      if (passwordsMatch) {
+        const { password: _, ...userWithoutPassword } = user.toObject();
+        const accessToken = signJwtAccessToken(userWithoutPassword);
+
+        const result = {
+          ...userWithoutPassword,
+          accessToken,
+        };
+
+        return new Response(JSON.stringify(result));
+      }
+    }
+
+    return new Response(JSON.stringify(null));
+  } catch (error) {
+    console.error("Error:", error);
+    return new Response(JSON.stringify(null));
+  }
 }
