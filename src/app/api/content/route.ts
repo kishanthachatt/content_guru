@@ -19,11 +19,9 @@ export async function GET(request: {
         }
       );
     }
-
-    return NextResponse.json(
-      { message: "Data retrieved successfully" },
-      { status: 200 }
-    );
+    await connectMongoDB();
+    const post = await Post.find();
+    return NextResponse.json({ post });
   } catch (error) {
     return NextResponse.json(
       { message: "Internal Server Error" },

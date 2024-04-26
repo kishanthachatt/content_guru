@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import User from "./user";
 
 const postSchema = new Schema(
   {
@@ -7,7 +8,7 @@ const postSchema = new Schema(
     author: {
       type: mongoose.Types.ObjectId,
       require: true,
-      ref: "user",
+      ref: User,
     },
   },
   {

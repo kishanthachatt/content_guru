@@ -13,19 +13,25 @@ import { RootState, useAppDispatch } from "@/store";
 
 import cn from "./content.module.scss";
 import { fetchContents } from "@/store/content/contentSlice";
+import { useRouter } from "next/navigation";
+import { ContentCard } from "@/components/ContentCard";
+import Grid from "@mui/material/Grid";
 
 const Content: React.FC = () => {
   const { data, isContentLoading } = useSelector(
     (state: RootState) => state.content
   );
   const dispatch = useAppDispatch();
-  const { data: session } = useSession();
+  const router = useRouter();
 
   React.useEffect(() => {
     dispatch(fetchContents());
-  }, [dispatch]);
+  }, []);
 
-  console.log(data, "testing");
+  const onAddpostClick = () => {
+    router.push("/content/insert-content");
+  };
+
   return (
     <Container maxWidth="md" className={cn.contentContainer}>
       <Box
@@ -36,12 +42,30 @@ const Content: React.FC = () => {
         <Typography variant="h2" color={"#2081b5"}>
           Posts
         </Typography>
-        <Button variant="contained" color="primary">
+        <Button variant="contained" color="primary" onClick={onAddpostClick}>
           Add post
         </Button>
       </Box>
       <Divider />
-      {isContentLoading ? <p>Loading...</p> : <p>content loaded</p>}
+      <Box pt={4}>
+        {isContentLoading ? (
+          <p>Loading...</p>
+        ) : (
+          <Grid container spacing={1}>
+            {data.contents
+              ? data.contents.map((item, index) => (
+                  <Grid item key={index} xs={12} md={6}>
+                    <ContentCard
+                      title={item.title}
+                      content={item.content}
+                      id={item._id}
+                    />
+                  </Grid>
+                ))
+              : ""}
+          </Grid>
+        )}
+      </Box>
     </Container>
   );
 };

@@ -1,7 +1,6 @@
 import axios from "axios";
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getSession } from "next-auth/react";
-import { cookies } from "next/headers";
 
 export interface ContentState {
   isContentLoading: boolean;
@@ -39,7 +38,6 @@ export const fetchContents = createAsyncThunk(
           authorization: accessToken,
         },
       });
-
       return response.data.post;
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
