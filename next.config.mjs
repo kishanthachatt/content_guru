@@ -1,16 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  async headers() {
+  async redirects() {
     return [
       {
-        // Disable CORS
-        source: "/api/:path*",
-        headers: [
-          {
-            key: "Access-Control-Allow-Origin",
-            value: "*",
-          },
-        ],
+        source: "/",
+        destination: "/content",
+        permanent: true,
       },
     ];
   },

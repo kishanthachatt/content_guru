@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import axios from "axios";
+import { useDispatch } from "react-redux";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -15,11 +16,10 @@ import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import { FormLabel } from "@mui/material";
 import Container from "@mui/material/Container";
+import { showSnackbar } from "@/store/snackbar/snackbarSlice";
 import { ContentForm, InsertContentProps as Props } from "./InsertContent.type";
 
 import cn from "./InsertContent.module.scss";
-import { showSnackbar } from "@/store/snackbar/snackbarSlice";
-import { useDispatch } from "react-redux";
 
 const InsertContent: React.FC<Props> = (props) => {
   const dispatch = useDispatch();

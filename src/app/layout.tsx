@@ -1,5 +1,6 @@
 "use client";
 
+import Head from "next/head";
 import { Provider } from "react-redux";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v13-appRouter";
 import { ThemeProvider } from "@mui/material/styles";
@@ -13,8 +14,6 @@ import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
-document.title = "Content Guru";
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -22,6 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <title>Content Guru</title>
+      </head>
       <body className={inter.className}>
         <Providers>
           <Provider store={store}>

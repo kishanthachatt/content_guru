@@ -4,21 +4,40 @@ import Post from "../../../../models/post";
 import { NextApiResponse } from "next";
 import { verifyJwt } from "../../../../lib/jwt";
 
-export async function GET() {
-  await connectMongoDB();
-  const post = await Post.find();
-  return NextResponse.json({ post });
+export async function GET(request: {
+  headers: { get: (arg0: string) => any };
+}) {
+  try {
+    const accessToken = request.headers.get("authorization");
+    if (!accessToken || !verifyJwt(accessToken)) {
+      return new Response(
+        JSON.stringify({
+          error: "unauthorized",
+        }),
+        {
+          status: 401,
+        }
+      );
+    }
+
+    return NextResponse.json(
+      { message: "Data retrieved successfully" },
+      { status: 200 }
+    );
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
 }
 
-export async function POST(
-  request: {
-    headers: { get: (arg0: string) => any };
-    json: () =>
-      | PromiseLike<{ title: any; content: any; author: any }>
-      | { title: any; content: any; author: any };
-  },
-  response: NextApiResponse
-) {
+export async function POST(request: {
+  headers: { get: (arg0: string) => any };
+  json: () =>
+    | PromiseLike<{ title: any; content: any; author: any }>
+    | { title: any; content: any; author: any };
+}) {
   try {
     const accessToken = request.headers.get("authorization");
     if (!accessToken || !verifyJwt(accessToken)) {

@@ -1,7 +1,7 @@
 @import "../../styles/all.modules";
 
 .contentContainer {
-  height: calc(100vh - 72px);
+  min-height: 100vh;
   overflow: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;

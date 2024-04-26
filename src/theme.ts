@@ -24,6 +24,11 @@ const theme: Theme = createTheme({
       fontFamily: ptSans.style.fontFamily as string,
       fontWeight: 700,
     },
+    h2: {
+      fontSize: "32px",
+      fontFamily: ptSans.style.fontFamily as string,
+      fontWeight: 700,
+    },
   },
   components: {
     MuiOutlinedInput: {
