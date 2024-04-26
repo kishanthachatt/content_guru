@@ -2,6 +2,8 @@
 
 import * as React from "react";
 import axios from "axios";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler } from "react-hook-form";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -16,8 +18,13 @@ import Container from "@mui/material/Container";
 import { ContentForm, InsertContentProps as Props } from "./InsertContent.type";
 
 import cn from "./InsertContent.module.scss";
+import { showSnackbar } from "@/store/snackbar/snackbarSlice";
+import { useDispatch } from "react-redux";
 
 const InsertContent: React.FC<Props> = (props) => {
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const { data: session } = useSession();
   const {
     register,
     handleSubmit,
@@ -28,17 +35,33 @@ const InsertContent: React.FC<Props> = (props) => {
   const [prompt, setPrompt] = React.useState<string>("");
 
   const onSubmit: SubmitHandler<ContentForm> = async (data: ContentForm) => {
+    setLoading(true);
     try {
-      const response = await axios.post("/api/content", {
-        title: data.title,
-        content: data.content,
-        author: "66290619a7620126d1ab06bb",
-      });
-      // Handle successful response (replace with your logic)
-      console.log("Content created successfully:", response.data);
+      const response = await axios.post(
+        "/api/content",
+        {
+          title: data.title,
+          content: data.content,
+          author: session?.user.id,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            authorization: session?.user.accessToken,
+          },
+        }
+      );
+      if (response.status === 201) {
+        router.push("/content");
+        setLoading(false);
+        dispatch(
+          showSnackbar({ message: response.data.message, type: "success" })
+        );
+      }
     } catch (error) {
-      debugger;
-      console.error("Failed to create content:", error);
+      dispatch(
+        showSnackbar({ message: "Failed to create post!", type: "error" })
+      );
     }
   };
 
