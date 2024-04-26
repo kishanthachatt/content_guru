@@ -16,6 +16,11 @@ import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import { FormLabel } from "@mui/material";
 import Container from "@mui/material/Container";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 import { showSnackbar } from "@/store/snackbar/snackbarSlice";
 import { ContentForm, InsertContentProps as Props } from "./InsertContent.type";
 
@@ -28,11 +33,16 @@ const InsertContent: React.FC<Props> = (props) => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
+    getValues,
   } = useForm<ContentForm>();
 
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [guruLoading, setGuruLoading] = React.useState<boolean>(false);
   const [prompt, setPrompt] = React.useState<string>("");
+  const [promptMessage, setPromptMessage] = React.useState<string>("");
+  const [promtDialog, setPromtDialog] = React.useState<boolean>(false);
 
   const onSubmit: SubmitHandler<ContentForm> = async (data: ContentForm) => {
     setLoading(true);
@@ -65,95 +75,157 @@ const InsertContent: React.FC<Props> = (props) => {
     }
   };
 
-  // const askGuruSubmit = async (e: any) => {
-  //   e.preventDefault();
-  //   const res = await fetch("/api/openai", {
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({ prompt }),
-  //   });
-  //   debugger;
-
-  //   const data = await res.json();
-  //   console.log(data, "Data");
-  //   // setResponse(data.choices[0].text);
-  // };
-
   const askGuruSubmit = async () => {
+    setGuruLoading(true);
     try {
-      const response = await fetch("/api/openai", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await axios.post(
+        "/api/openai",
+        {
+          prompt: prompt,
         },
-        body: JSON.stringify({ prompt: prompt }),
-      });
-      const data = await response.json();
-      // setGeneratedText(data.text);
+        {
+          headers: {
+            "Content-Type": "application/json",
+            authorization: session?.user.accessToken,
+          },
+        }
+      );
+      if (response.status === 200) {
+        setPromptMessage(response.data.message);
+        setPromtDialog(true);
+        setGuruLoading(false);
+        setPrompt("");
+        dispatch(
+          showSnackbar({
+            message: "Guru replied successfully",
+            type: "success",
+          })
+        );
+      }
     } catch (error) {
-      console.error("Error generating text:", error);
+      dispatch(
+        showSnackbar({
+          message: "Sorry! Guru failed to reply",
+          type: "error",
+        })
+      );
     }
+  };
+  const onPromtAccept = () => {
+    setPromtDialog(false);
+    const currentValue = getValues("content");
+    setValue("content", `${currentValue} ${promptMessage}`);
+    setPrompt("");
+    setPromptMessage("");
+  };
+
+  const onPromtReject = () => {
+    setPromtDialog(false);
+    setPrompt("");
+    setPromptMessage("");
   };
 
   return (
-    <Container maxWidth="lg" className={cn.insertContentContainer}>
-      <Card variant="outlined" className={cn.insertContentCard}>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <CardContent className={cn.card}>
-            <FormLabel className={cn.formLabel}>Title</FormLabel>
-            <TextField
-              variant="outlined"
-              placeholder="Add a title"
-              error={Boolean(errors.title)}
-              helperText={errors.title?.message as string}
-              {...register("title", { required: "Title is required" })}
-              fullWidth
-            />
-            <FormLabel className={cn.formLabel}>Content</FormLabel>
-            <TextField
-              placeholder="Enter your content"
-              variant="outlined"
-              multiline
-              rows={7}
-              error={Boolean(errors.content)}
-              helperText={errors.content?.message as string}
-              {...register("content", { required: "Content is required" })}
-              fullWidth
-            />
-            <Divider />
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={10}>
-                <TextField
-                  variant="filled"
-                  placeholder="How can I help you? Ask content guru !"
-                  fullWidth
-                  onChange={(e) => setPrompt(e.target.value)}
-                />
+    <React.Fragment>
+      <Container maxWidth="lg" className={cn.insertContentContainer}>
+        <Card variant="outlined" className={cn.insertContentCard}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <CardContent className={cn.card}>
+              <FormLabel className={cn.formLabel}>Title</FormLabel>
+              <TextField
+                variant="outlined"
+                placeholder="Add a title"
+                error={Boolean(errors.title)}
+                helperText={errors.title?.message as string}
+                {...register("title", { required: "Title is required" })}
+                fullWidth
+                disabled={guruLoading}
+              />
+              <FormLabel className={cn.formLabel}>Content</FormLabel>
+              <TextField
+                placeholder="Enter your content"
+                variant="outlined"
+                multiline
+                rows={7}
+                error={Boolean(errors.content)}
+                helperText={errors.content?.message as string}
+                {...register("content", { required: "Content is required" })}
+                fullWidth
+                disabled={guruLoading}
+              />
+              <Divider />
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={10}>
+                  <TextField
+                    variant="filled"
+                    placeholder="How can I help you? Ask content guru !"
+                    fullWidth
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    disabled={guruLoading}
+                  />
+                </Grid>
+                <Grid item xs={2}>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    fullWidth
+                    onClick={askGuruSubmit}
+                  >
+                    {guruLoading ? (
+                      <CircularProgress size={24} color="inherit" />
+                    ) : (
+                      "Ask Guru"
+                    )}
+                  </Button>
+                </Grid>
               </Grid>
-              <Grid item xs={2}>
-                <Button
-                  variant="contained"
-                  color="success"
-                  fullWidth
-                  onClick={askGuruSubmit}
-                >
-                  Ask Guru
-                </Button>
-              </Grid>
-            </Grid>
-          </CardContent>
-          <CardActions sx={{ p: 2 }}>
-            <Button variant="contained" color="primary" type="submit">
-              {loading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                "Add my Content"
-              )}
-            </Button>
-          </CardActions>
-        </form>
-      </Card>
-    </Container>
+            </CardContent>
+            <CardActions sx={{ p: 2 }}>
+              <Button
+                variant="outlined"
+                color="primary"
+                type="submit"
+                disabled={guruLoading}
+                onClick={() => router.push("/content")}
+                sx={{ width: "50%" }}
+              >
+                {loading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  "Back"
+                )}
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                disabled={guruLoading}
+                sx={{ width: "50%" }}
+              >
+                {loading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  "Add my Content"
+                )}
+              </Button>
+            </CardActions>
+          </form>
+        </Card>
+      </Container>
+      <Dialog open={promtDialog} onClose={onPromtReject}>
+        <DialogTitle>{"Guru's suggestion about your content"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{promptMessage}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onPromtReject}>Reject</Button>
+          <Button onClick={onPromtAccept} autoFocus>
+            Accept
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </React.Fragment>
   );
 };
 
