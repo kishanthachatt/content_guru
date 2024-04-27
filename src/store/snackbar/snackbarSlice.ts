@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-interface SnackbarState {
+export interface SnackbarState {
   open: boolean;
   message: string;
   type: "success" | "error" | "warning" | "info";
