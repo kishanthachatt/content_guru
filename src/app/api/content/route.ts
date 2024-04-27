@@ -66,10 +66,32 @@ export async function POST(request: {
 }
 
 export async function DELETE(request: {
+  headers: { get: (arg0: string) => any };
   nextUrl: { searchParams: { get: (arg0: string) => any } };
 }) {
-  const id = request.nextUrl.searchParams.get("id");
-  await connectMongoDB();
-  await Post.findByIdAndDelete(id);
-  return NextResponse.json({ message: "Post deleted" }, { status: 200 });
+  try {
+    const accessToken = request.headers.get("authorization");
+    if (!accessToken || !verifyJwt(accessToken)) {
+      return new Response(
+        JSON.stringify({
+          error: "unauthorized",
+        }),
+        {
+          status: 401,
+        }
+      );
+    }
+    const id = request.nextUrl.searchParams.get("id");
+    await connectMongoDB();
+    await Post.findByIdAndDelete(id);
+    return NextResponse.json(
+      { message: "Successfully post deleted " },
+      { status: 200 }
+    );
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
 }

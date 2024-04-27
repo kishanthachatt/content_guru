@@ -101,7 +101,6 @@ export const contentSlice = createSlice({
         state.isError = false;
       })
       .addCase(fetchPost.fulfilled, (state, action) => {
-        debugger;
         state.isContentLoading = false;
         state.isSuccess = true;
         state.currentPost = action.payload;

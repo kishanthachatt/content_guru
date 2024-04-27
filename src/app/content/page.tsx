@@ -49,7 +49,7 @@ const Content: React.FC = () => {
         {isContentLoading ? (
           <p>Loading...</p>
         ) : (
-          <Grid container spacing={1}>
+          <Grid container spacing={1.5}>
             {data.contents
               ? data.contents.map((item, index) => (
                   <Grid item key={index} xs={12} md={6}>

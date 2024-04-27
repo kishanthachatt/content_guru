@@ -17,7 +17,6 @@ const snackbarSlice = createSlice({
   initialState,
   reducers: {
     showSnackbar: (state, action) => {
-      debugger;
       state.open = true;
       state.message = action.payload.message;
       state.type = action.payload.type;

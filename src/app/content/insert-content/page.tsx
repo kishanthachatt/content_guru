@@ -111,6 +111,7 @@ const InsertContent: React.FC<Props> = (props) => {
       );
     }
   };
+
   const onPromtAccept = () => {
     setPromtDialog(false);
     const currentValue = getValues("content");

@@ -27,7 +27,7 @@ export function ContentCard(props: Props): React.ReactElement {
             <MoreVertIcon />
           </IconButton>
         }
-        title={trimString(props.title, 32)}
+        title={trimString(props.title, 28)}
       />
       <CardContent sx={{ minHeight: "152px", maxHeight: "152px" }}>
         <Typography variant="body2" color="text.secondary">
