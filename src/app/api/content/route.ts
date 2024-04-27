@@ -20,7 +20,7 @@ export async function GET(request: {
       );
     }
     await connectMongoDB();
-    const post = await Post.find();
+    const post = await Post.find().sort({ createdTime: -1 });
     return NextResponse.json({ post });
   } catch (error) {
     return NextResponse.json(
