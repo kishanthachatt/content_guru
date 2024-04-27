@@ -105,7 +105,14 @@ const ContentDetail: React.FC = () => {
               >
                 Back
               </Button>
-              <Button variant="contained" color="info" sx={{ width: "34%" }}>
+              <Button
+                variant="contained"
+                color="info"
+                sx={{ width: "34%" }}
+                onClick={() =>
+                  router.push(`/content/edit-content/${params.id}`)
+                }
+              >
                 Edit
               </Button>
               <Button

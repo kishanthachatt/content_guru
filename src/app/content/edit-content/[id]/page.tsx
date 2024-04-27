@@ -2,9 +2,9 @@
 
 import * as React from "react";
 import axios from "axios";
-import { useDispatch } from "react-redux";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import { useParams, useRouter } from "next/navigation";
 import { useForm, SubmitHandler } from "react-hook-form";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -22,13 +22,16 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { showSnackbar } from "@/store/snackbar/snackbarSlice";
-import { ContentForm, InsertContentProps as Props } from "./InsertContent.type";
+import { fetchPost } from "@/store/content/contentSlice";
+import { RootState, useAppDispatch } from "@/store";
+import { ContentForm, InsertContentProps as Props } from "./EditContent.type";
 
-import cn from "./InsertContent.module.scss";
+import cn from "./EditContent.module.scss";
 
 const InsertContent: React.FC<Props> = (props) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const router = useRouter();
+  const params = useParams();
   const { data: session } = useSession();
   const {
     register,
@@ -37,6 +40,19 @@ const InsertContent: React.FC<Props> = (props) => {
     formState: { errors },
     getValues,
   } = useForm<ContentForm>();
+
+  const { isContentLoading, currentPost } = useSelector(
+    (state: RootState) => state.content
+  );
+
+  React.useEffect(() => {
+    dispatch(fetchPost(params.id as string));
+  }, [params]);
+
+  React.useEffect(() => {
+    setValue("title", currentPost.title);
+    setValue("content", currentPost.content);
+  }, [currentPost]);
 
   const [loading, setLoading] = React.useState<boolean>(false);
   const [guruLoading, setGuruLoading] = React.useState<boolean>(false);
@@ -47,8 +63,8 @@ const InsertContent: React.FC<Props> = (props) => {
   const onSubmit: SubmitHandler<ContentForm> = async (data: ContentForm) => {
     setLoading(true);
     try {
-      const response = await axios.post(
-        "/api/content",
+      const response = await axios.put(
+        `/api/content/${params.id}`,
         {
           title: data.title,
           content: data.content,
@@ -61,14 +77,16 @@ const InsertContent: React.FC<Props> = (props) => {
           },
         }
       );
-      if (response.status === 201) {
-        router.push("/content");
+      if (response.status === 200) {
+        router.push(`/content/${params.id}`);
+        debugger;
         setLoading(false);
         dispatch(
           showSnackbar({ message: response.data.message, type: "success" })
         );
       }
     } catch (error) {
+      setLoading(false);
       dispatch(
         showSnackbar({ message: "Failed to create post!", type: "error" })
       );
@@ -130,86 +148,90 @@ const InsertContent: React.FC<Props> = (props) => {
   return (
     <React.Fragment>
       <Container maxWidth="lg" className={cn.insertContentContainer}>
-        <Card variant="outlined" className={cn.insertContentCard}>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <CardContent className={cn.card}>
-              <FormLabel className={cn.formLabel}>Title</FormLabel>
-              <TextField
-                variant="outlined"
-                placeholder="Add a title"
-                error={Boolean(errors.title)}
-                helperText={errors.title?.message as string}
-                {...register("title", { required: "Title is required" })}
-                fullWidth
-                disabled={guruLoading}
-              />
-              <FormLabel className={cn.formLabel}>Content</FormLabel>
-              <TextField
-                placeholder="Enter your content"
-                variant="outlined"
-                multiline
-                rows={7}
-                error={Boolean(errors.content)}
-                helperText={errors.content?.message as string}
-                {...register("content", { required: "Content is required" })}
-                fullWidth
-                disabled={guruLoading}
-              />
-              <Divider />
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs={10}>
-                  <TextField
-                    variant="filled"
-                    placeholder="How can I help you? Ask content guru !"
-                    fullWidth
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    disabled={guruLoading}
-                  />
+        {isContentLoading ? (
+          <p>loading...</p>
+        ) : (
+          <Card variant="outlined" className={cn.insertContentCard}>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <CardContent className={cn.card}>
+                <FormLabel className={cn.formLabel}>Title</FormLabel>
+                <TextField
+                  variant="outlined"
+                  placeholder="Add a title"
+                  error={Boolean(errors.title)}
+                  helperText={errors.title?.message as string}
+                  {...register("title", { required: "Title is required" })}
+                  fullWidth
+                  disabled={guruLoading}
+                />
+                <FormLabel className={cn.formLabel}>Content</FormLabel>
+                <TextField
+                  placeholder="Enter your content"
+                  variant="outlined"
+                  multiline
+                  rows={7}
+                  error={Boolean(errors.content)}
+                  helperText={errors.content?.message as string}
+                  {...register("content", { required: "Content is required" })}
+                  fullWidth
+                  disabled={guruLoading}
+                />
+                <Divider />
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={10}>
+                    <TextField
+                      variant="filled"
+                      placeholder="How can I help you? Ask content guru !"
+                      fullWidth
+                      value={prompt}
+                      onChange={(e) => setPrompt(e.target.value)}
+                      disabled={guruLoading}
+                    />
+                  </Grid>
+                  <Grid item xs={2}>
+                    <Button
+                      variant="contained"
+                      color="success"
+                      fullWidth
+                      onClick={askGuruSubmit}
+                    >
+                      {guruLoading ? (
+                        <CircularProgress size={24} color="inherit" />
+                      ) : (
+                        "Ask Guru"
+                      )}
+                    </Button>
+                  </Grid>
                 </Grid>
-                <Grid item xs={2}>
-                  <Button
-                    variant="contained"
-                    color="success"
-                    fullWidth
-                    onClick={askGuruSubmit}
-                  >
-                    {guruLoading ? (
-                      <CircularProgress size={24} color="inherit" />
-                    ) : (
-                      "Ask Guru"
-                    )}
-                  </Button>
-                </Grid>
-              </Grid>
-            </CardContent>
-            <CardActions sx={{ p: 2 }}>
-              <Button
-                variant="outlined"
-                color="primary"
-                type="submit"
-                disabled={guruLoading}
-                onClick={() => router.push("/content")}
-                sx={{ width: "50%" }}
-              >
-                Back
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                type="submit"
-                disabled={guruLoading}
-                sx={{ width: "50%" }}
-              >
-                {loading ? (
-                  <CircularProgress size={24} color="inherit" />
-                ) : (
-                  "Add my Content"
-                )}
-              </Button>
-            </CardActions>
-          </form>
-        </Card>
+              </CardContent>
+              <CardActions sx={{ p: 2 }}>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  type="submit"
+                  disabled={guruLoading}
+                  onClick={() => router.push("/content")}
+                  sx={{ width: "50%" }}
+                >
+                  Back
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  type="submit"
+                  disabled={guruLoading}
+                  sx={{ width: "50%" }}
+                >
+                  {loading ? (
+                    <CircularProgress size={24} color="inherit" />
+                  ) : (
+                    "Update Content"
+                  )}
+                </Button>
+              </CardActions>
+            </form>
+          </Card>
+        )}
       </Container>
       <Dialog open={promtDialog} onClose={onPromtReject}>
         <DialogTitle>{"Guru's suggestion about your content"}</DialogTitle>
