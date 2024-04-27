@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import CardContent from "@mui/material/CardContent";
@@ -12,6 +13,12 @@ import { trimString } from "@/utils/commonUtils";
 import { ContentCardProps as Props } from "./ContentCard.interface";
 
 export function ContentCard(props: Props): React.ReactElement {
+  const router = useRouter();
+
+  const onViewMoreClick = () => {
+    router.push(`/content/${props.id}`);
+  };
+
   return (
     <Card sx={{ border: "2px solid #2081b5", minHeight: "272px" }}>
       <CardHeader
@@ -28,7 +35,9 @@ export function ContentCard(props: Props): React.ReactElement {
         </Typography>
       </CardContent>
       <CardActions disableSpacing sx={{ justifyContent: "flex-end" }}>
-        <Button variant="text">View More</Button>
+        <Button variant="text" onClick={onViewMoreClick}>
+          View More
+        </Button>
       </CardActions>
     </Card>
   );

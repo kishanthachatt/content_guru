@@ -1,0 +1,21 @@
+.contentDetailContainer {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 72px);
+  overflow-y: scroll;
+  overflow: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 32px;
+  .detailContentCard {
+    width: 90%;
+    height: 85%;
+    padding: 16px 32px;
+  }
+  .cardContent {
+    height: 70%;
+    overflow: auto;
+  }
+}

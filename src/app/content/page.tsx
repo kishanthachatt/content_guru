@@ -1,21 +1,19 @@
 "use client";
 
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useSession } from "next-auth/react";
-import Cookies from "js-cookie";
+import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Divider from "@mui/material/Divider";
+import Grid from "@mui/material/Grid";
 import { RootState, useAppDispatch } from "@/store";
+import { fetchContents } from "@/store/content/contentSlice";
+import { ContentCard } from "@/components/ContentCard";
 
 import cn from "./content.module.scss";
-import { fetchContents } from "@/store/content/contentSlice";
-import { useRouter } from "next/navigation";
-import { ContentCard } from "@/components/ContentCard";
-import Grid from "@mui/material/Grid";
 
 const Content: React.FC = () => {
   const { data, isContentLoading } = useSelector(

@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { connectMongoDB } from "../../../../../lib/mongodb";
 import Post from "../../../../../models/post";
+import { verifyJwt } from "../../../../../lib/jwt";
 
 export async function PUT(
   request: {
@@ -20,8 +21,26 @@ export async function PUT(
 }
 
 export async function GET(request: any, { params }: any) {
-  const { id } = params;
-  await connectMongoDB();
-  const posts = await Post.findOne({ _id: id });
-  return NextResponse.json({ posts }, { status: 200 });
+  try {
+    const accessToken = request.headers.get("authorization");
+    if (!accessToken || !verifyJwt(accessToken)) {
+      return new Response(
+        JSON.stringify({
+          error: "unauthorized",
+        }),
+        {
+          status: 401,
+        }
+      );
+    }
+    const { id } = params;
+    await connectMongoDB();
+    const post = await Post.findOne({ _id: id });
+    return NextResponse.json({ post }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
 }
