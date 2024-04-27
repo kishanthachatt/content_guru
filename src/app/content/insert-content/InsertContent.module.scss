@@ -1,0 +1,29 @@
+@import "../../../styles/all.modules";
+
+.insertContentContainer {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 72px);
+  overflow: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  // background-color: #ffffff;
+  .insertContentCard {
+    width: 80%;
+    padding: 16px 32px;
+    .card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      .formLabel {
+        font-size: 18px;
+        font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+          "Lucida Sans", Arial, sans-serif;
+        font-weight: 600;
+        color: #000000;
+      }
+    }
+  }
+}

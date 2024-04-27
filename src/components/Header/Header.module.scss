@@ -1,0 +1,39 @@
+@import "../../styles/all.modules";
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+  padding: 0px 32px;
+  background-color: $color-primary-blue;
+  .profile {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    .name {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      color: #ffffff;
+      > b {
+        font-size: 18px;
+      }
+      > span {
+        font-size: 14px;
+        cursor: pointer;
+      }
+    }
+    .image {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      height: 40px;
+      background-color: chocolate;
+      border-radius: 50%;
+      border: 1px solid #000000;
+    }
+  }
+}
