@@ -14,6 +14,7 @@ import { fetchContents } from "@/store/content/contentSlice";
 import { ContentCard } from "@/components/ContentCard";
 
 import cn from "./content.module.scss";
+import Loader from "@/components/Loader";
 
 const Content: React.FC = () => {
   const { data, isContentLoading } = useSelector(
@@ -45,11 +46,11 @@ const Content: React.FC = () => {
         </Button>
       </Box>
       <Divider />
-      <Box pt={4}>
+      <Box pt={4} sx={{ height: "100%" }}>
         {isContentLoading ? (
-          <p>Loading...</p>
+          <Loader />
         ) : (
-          <Grid container spacing={1.5}>
+          <Grid container spacing={1.5} pb={5}>
             {data.contents
               ? data.contents.map((item, index) => (
                   <Grid item key={index} xs={12} md={6}>

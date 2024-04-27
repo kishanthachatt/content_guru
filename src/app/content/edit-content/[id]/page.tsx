@@ -27,6 +27,7 @@ import { RootState, useAppDispatch } from "@/store";
 import { ContentForm, InsertContentProps as Props } from "./EditContent.type";
 
 import cn from "./EditContent.module.scss";
+import Loader from "@/components/Loader";
 
 const InsertContent: React.FC<Props> = (props) => {
   const dispatch = useAppDispatch();
@@ -149,7 +150,7 @@ const InsertContent: React.FC<Props> = (props) => {
     <React.Fragment>
       <Container maxWidth="lg" className={cn.insertContentContainer}>
         {isContentLoading ? (
-          <p>loading...</p>
+          <Loader />
         ) : (
           <Card variant="outlined" className={cn.insertContentCard}>
             <form onSubmit={handleSubmit(onSubmit)}>

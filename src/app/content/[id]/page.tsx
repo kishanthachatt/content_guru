@@ -23,6 +23,7 @@ import cn from "./ContentDetail.module.scss";
 import axios from "axios";
 import { showSnackbar } from "@/store/snackbar/snackbarSlice";
 import { useSession } from "next-auth/react";
+import Loader from "@/components/Loader";
 
 const ContentDetail: React.FC = () => {
   const params = useParams();
@@ -73,7 +74,7 @@ const ContentDetail: React.FC = () => {
     <React.Fragment>
       <Container maxWidth="lg" className={cn.contentDetailContainer}>
         {isContentLoading ? (
-          <p>Loading...</p>
+          <Loader />
         ) : (
           <Card variant="outlined" className={cn.detailContentCard}>
             <CardHeader
