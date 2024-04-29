@@ -8,4 +8,17 @@
   -ms-overflow-style: none;
   background-color: #ffffff;
   padding-bottom: 32px;
+  .noDataFound {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    > p {
+      font-size: 24px;
+      font-weight: 500;
+      color: #000;
+    }
+  }
 }

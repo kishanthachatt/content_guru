@@ -3,6 +3,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -12,9 +13,9 @@ import Grid from "@mui/material/Grid";
 import { RootState, useAppDispatch } from "@/store";
 import { fetchContents } from "@/store/content/contentSlice";
 import { ContentCard } from "@/components/ContentCard";
+import Loader from "@/components/Loader";
 
 import cn from "./content.module.scss";
-import Loader from "@/components/Loader";
 
 const Content: React.FC = () => {
   const { data, isContentLoading } = useSelector(
@@ -51,17 +52,28 @@ const Content: React.FC = () => {
           <Loader />
         ) : (
           <Grid container spacing={1.5} pb={5}>
-            {data.contents
-              ? data.contents.map((item, index) => (
-                  <Grid item key={index} xs={12} md={6}>
-                    <ContentCard
-                      title={item.title}
-                      content={item.content}
-                      id={item._id}
-                    />
-                  </Grid>
-                ))
-              : ""}
+            {data?.contents?.length !== 0 ? (
+              data.contents.map((item, index) => (
+                <Grid item key={index} xs={12} md={6}>
+                  <ContentCard
+                    title={item.title}
+                    content={item.content}
+                    id={item._id}
+                  />
+                </Grid>
+              ))
+            ) : (
+              <div className={cn.noDataFound}>
+                <Image
+                  src="/NoDataFound.svg"
+                  alt=" Logo"
+                  width={500}
+                  height={600}
+                  priority
+                />
+                <p>No Content so far! Add one</p>
+              </div>
+            )}
           </Grid>
         )}
       </Box>

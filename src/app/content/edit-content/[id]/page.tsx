@@ -203,7 +203,6 @@ const InsertContent: React.FC<Props> = (props) => {
                   toolbar={{
                     options: [
                       "inline",
-                      "fontFamily",
                       "list",
                       "textAlign",
                       "link",

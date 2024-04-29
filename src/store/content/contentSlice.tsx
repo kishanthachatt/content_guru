@@ -12,7 +12,7 @@ export interface ContentState {
 }
 
 const initialState: ContentState = {
-  isContentLoading: false,
+  isContentLoading: true,
   isError: false,
   isSuccess: false,
   error: {},

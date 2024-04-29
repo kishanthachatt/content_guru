@@ -127,7 +127,7 @@ const InsertContent: React.FC<Props> = (props) => {
       anchorOffset: selectionState.getEndOffset(),
       focusOffset: selectionState.getEndOffset(),
     });
-    const newContentText = `\n<p> ${promptMessage}<p>`;
+    const newContentText = `\n ${promptMessage}`;
     const newContentState = Modifier.insertText(
       existingContentState,
       collapsedSelectionState,
@@ -175,7 +175,6 @@ const InsertContent: React.FC<Props> = (props) => {
                 toolbar={{
                   options: [
                     "inline",
-                    "fontFamily",
                     "list",
                     "textAlign",
                     "link",

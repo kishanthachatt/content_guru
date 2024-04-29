@@ -72,7 +72,7 @@ const Login: React.FC = () => {
             />
           </CardContent>
           <CardActions className={cn.loginCardAction}>
-            <Button variant="contained" color="primary" type="submit">
+            <Button variant="contained" color="primary" type="submit" fullWidth>
               {loading ? (
                 <CircularProgress size={24} color="inherit" />
               ) : (
