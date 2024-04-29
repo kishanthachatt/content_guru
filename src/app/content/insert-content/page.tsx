@@ -23,7 +23,11 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { showSnackbar } from "@/store/snackbar/snackbarSlice";
 import { ContentForm, InsertContentProps as Props } from "./InsertContent.type";
+import { EditorState, ContentState, convertToRaw, Modifier } from "draft-js";
+import { Editor, ContentBlock } from "react-draft-wysiwyg";
+import { stateToHTML } from "draft-js-export-html";
 
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import cn from "./InsertContent.module.scss";
 
 const InsertContent: React.FC<Props> = (props) => {
@@ -33,9 +37,7 @@ const InsertContent: React.FC<Props> = (props) => {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
-    getValues,
   } = useForm<ContentForm>();
 
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -43,15 +45,19 @@ const InsertContent: React.FC<Props> = (props) => {
   const [prompt, setPrompt] = React.useState<string>("");
   const [promptMessage, setPromptMessage] = React.useState<string>("");
   const [promtDialog, setPromtDialog] = React.useState<boolean>(false);
+  const [editorState, setEditorState] = React.useState(() =>
+    EditorState.createEmpty()
+  );
 
   const onSubmit: SubmitHandler<ContentForm> = async (data: ContentForm) => {
     setLoading(true);
+    const rawContentState = stateToHTML(editorState.getCurrentContent());
     try {
       const response = await axios.post(
         "/api/content",
         {
           title: data.title,
-          content: data.content,
+          content: rawContentState,
           author: session?.user.id,
         },
         {
@@ -72,6 +78,7 @@ const InsertContent: React.FC<Props> = (props) => {
       dispatch(
         showSnackbar({ message: "Failed to create post!", type: "error" })
       );
+      setLoading(false);
     }
   };
 
@@ -113,10 +120,30 @@ const InsertContent: React.FC<Props> = (props) => {
     }
   };
 
+  const addGuruSuggestion = () => {
+    const existingContentState = editorState.getCurrentContent();
+    const selectionState = editorState.getSelection();
+    const collapsedSelectionState = selectionState.merge({
+      anchorOffset: selectionState.getEndOffset(),
+      focusOffset: selectionState.getEndOffset(),
+    });
+    const newContentText = `\n ${promptMessage}`;
+    const newContentState = Modifier.insertText(
+      existingContentState,
+      collapsedSelectionState,
+      newContentText
+    );
+    const newEditorState = EditorState.push(
+      editorState,
+      newContentState,
+      "insert-characters"
+    );
+    setEditorState(newEditorState);
+  };
+
   const onPromtAccept = () => {
     setPromtDialog(false);
-    const currentValue = getValues("content");
-    setValue("content", `${currentValue} ${promptMessage}`);
+    addGuruSuggestion();
     setPrompt("");
     setPromptMessage("");
   };
@@ -144,16 +171,20 @@ const InsertContent: React.FC<Props> = (props) => {
                 disabled={guruLoading}
               />
               <FormLabel className={cn.formLabel}>Content</FormLabel>
-              <TextField
-                placeholder="Enter your content"
-                variant="outlined"
-                multiline
-                rows={7}
-                error={Boolean(errors.content)}
-                helperText={errors.content?.message as string}
-                {...register("content", { required: "Content is required" })}
-                fullWidth
-                disabled={guruLoading}
+              <Editor
+                toolbar={{
+                  options: [
+                    "inline",
+                    "list",
+                    "textAlign",
+                    "link",
+                    "emoji",
+                    "remove",
+                    "history",
+                  ],
+                }}
+                editorState={editorState}
+                onEditorStateChange={setEditorState}
               />
               <Divider />
               <Grid container spacing={2} alignItems="center">

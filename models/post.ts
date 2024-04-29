@@ -4,7 +4,7 @@ import User from "./user";
 const postSchema = new Schema(
   {
     title: { type: String, required: true },
-    content: { type: String, required: true },
+    content: { type: Schema.Types.Mixed, required: true },
     author: {
       type: mongoose.Types.ObjectId,
       require: true,
