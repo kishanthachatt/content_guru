@@ -21,15 +21,10 @@ export function ContentCard(props: Props): React.ReactElement {
 
   return (
     <Card sx={{ border: "2px solid #2081b5", minHeight: "272px" }}>
-      <CardHeader
-        action={
-          <IconButton aria-label="settings">
-            <MoreVertIcon />
-          </IconButton>
-        }
-        title={trimString(props.title, 28)}
-      />
-      <CardContent sx={{ minHeight: "152px", maxHeight: "152px" }}>
+      <CardHeader title={trimString(props.title, 28)} />
+      <CardContent
+        sx={{ minHeight: "152px", maxHeight: "152px", overflow: "hidden" }}
+      >
         {props.content && (
           <div dangerouslySetInnerHTML={{ __html: props.content }} />
         )}

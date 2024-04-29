@@ -172,6 +172,18 @@ const InsertContent: React.FC<Props> = (props) => {
               />
               <FormLabel className={cn.formLabel}>Content</FormLabel>
               <Editor
+                toolbar={{
+                  options: [
+                    "inline",
+                    "fontFamily",
+                    "list",
+                    "textAlign",
+                    "link",
+                    "emoji",
+                    "remove",
+                    "history",
+                  ],
+                }}
                 editorState={editorState}
                 onEditorStateChange={setEditorState}
               />

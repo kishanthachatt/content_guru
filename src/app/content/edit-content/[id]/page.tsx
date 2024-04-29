@@ -25,9 +25,14 @@ import { showSnackbar } from "@/store/snackbar/snackbarSlice";
 import { fetchPost } from "@/store/content/contentSlice";
 import { RootState, useAppDispatch } from "@/store";
 import { ContentForm, InsertContentProps as Props } from "./EditContent.type";
-
-import cn from "./EditContent.module.scss";
+import { EditorState, convertToRaw, Modifier } from "draft-js";
+import { Editor, ContentBlock } from "react-draft-wysiwyg";
+import { stateToHTML } from "draft-js-export-html";
+import { stateFromHTML } from "draft-js-import-html";
 import Loader from "@/components/Loader";
+
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import cn from "./EditContent.module.scss";
 
 const InsertContent: React.FC<Props> = (props) => {
   const dispatch = useAppDispatch();
@@ -45,6 +50,14 @@ const InsertContent: React.FC<Props> = (props) => {
   const { isContentLoading, currentPost } = useSelector(
     (state: RootState) => state.content
   );
+  const [loading, setLoading] = React.useState<boolean>(false);
+  const [guruLoading, setGuruLoading] = React.useState<boolean>(false);
+  const [prompt, setPrompt] = React.useState<string>("");
+  const [promptMessage, setPromptMessage] = React.useState<string>("");
+  const [promtDialog, setPromtDialog] = React.useState<boolean>(false);
+  const [editorState, setEditorState] = React.useState(() =>
+    EditorState.createEmpty()
+  );
 
   React.useEffect(() => {
     dispatch(fetchPost(params.id as string));
@@ -52,23 +65,23 @@ const InsertContent: React.FC<Props> = (props) => {
 
   React.useEffect(() => {
     setValue("title", currentPost.title);
-    setValue("content", currentPost.content);
+    if (currentPost.content) {
+      const initialContentState = stateFromHTML(currentPost.content);
+      const initialEditorState =
+        EditorState.createWithContent(initialContentState);
+      setEditorState(initialEditorState);
+    }
   }, [currentPost]);
-
-  const [loading, setLoading] = React.useState<boolean>(false);
-  const [guruLoading, setGuruLoading] = React.useState<boolean>(false);
-  const [prompt, setPrompt] = React.useState<string>("");
-  const [promptMessage, setPromptMessage] = React.useState<string>("");
-  const [promtDialog, setPromtDialog] = React.useState<boolean>(false);
 
   const onSubmit: SubmitHandler<ContentForm> = async (data: ContentForm) => {
     setLoading(true);
+    const rawContentState = stateToHTML(editorState.getCurrentContent());
     try {
       const response = await axios.put(
         `/api/content/${params.id}`,
         {
           title: data.title,
-          content: data.content,
+          content: rawContentState,
           author: session?.user.id,
         },
         {
@@ -132,10 +145,30 @@ const InsertContent: React.FC<Props> = (props) => {
     }
   };
 
+  const addGuruSuggestion = () => {
+    const existingContentState = editorState.getCurrentContent();
+    const selectionState = editorState.getSelection();
+    const collapsedSelectionState = selectionState.merge({
+      anchorOffset: selectionState.getEndOffset(),
+      focusOffset: selectionState.getEndOffset(),
+    });
+    const newContentText = `\n ${promptMessage}`;
+    const newContentState = Modifier.insertText(
+      existingContentState,
+      collapsedSelectionState,
+      newContentText
+    );
+    const newEditorState = EditorState.push(
+      editorState,
+      newContentState,
+      "insert-characters"
+    );
+    setEditorState(newEditorState);
+  };
+
   const onPromtAccept = () => {
     setPromtDialog(false);
-    const currentValue = getValues("content");
-    setValue("content", `${currentValue} ${promptMessage}`);
+    addGuruSuggestion();
     setPrompt("");
     setPromptMessage("");
   };
@@ -166,16 +199,21 @@ const InsertContent: React.FC<Props> = (props) => {
                   disabled={guruLoading}
                 />
                 <FormLabel className={cn.formLabel}>Content</FormLabel>
-                <TextField
-                  placeholder="Enter your content"
-                  variant="outlined"
-                  multiline
-                  rows={7}
-                  error={Boolean(errors.content)}
-                  helperText={errors.content?.message as string}
-                  {...register("content", { required: "Content is required" })}
-                  fullWidth
-                  disabled={guruLoading}
+                <Editor
+                  toolbar={{
+                    options: [
+                      "inline",
+                      "fontFamily",
+                      "list",
+                      "textAlign",
+                      "link",
+                      "emoji",
+                      "remove",
+                      "history",
+                    ],
+                  }}
+                  editorState={editorState}
+                  onEditorStateChange={setEditorState}
                 />
                 <Divider />
                 <Grid container spacing={2} alignItems="center">
