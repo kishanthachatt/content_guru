@@ -3,7 +3,9 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { DateTime } from "luxon";
+import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
@@ -15,15 +17,12 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
+import Loader from "@/components/Loader";
 import { RootState, useAppDispatch } from "@/store";
 import { fetchPost } from "@/store/content/contentSlice";
+import { showSnackbar } from "@/store/snackbar/snackbarSlice";
 
 import cn from "./ContentDetail.module.scss";
-import axios from "axios";
-import { showSnackbar } from "@/store/snackbar/snackbarSlice";
-import { useSession } from "next-auth/react";
-import Loader from "@/components/Loader";
 
 const ContentDetail: React.FC = () => {
   const params = useParams();
@@ -80,7 +79,7 @@ const ContentDetail: React.FC = () => {
             <CardHeader
               disableSpacing
               title={
-                <Typography variant="h2">{currentPost.title ?? ""}</Typography>
+                <Typography variant="h2">{currentPost?.title ?? ""}</Typography>
               }
               subheader={
                 <Typography variant="body2">
@@ -94,7 +93,11 @@ const ContentDetail: React.FC = () => {
 
             <CardContent className={cn.cardContent}>
               <Typography variant="body1">
-                {/* {currentPost.content ?? "SORRY, NO CONTENT TO DISPLAY"} */}
+                {currentPost.content && (
+                  <div
+                    dangerouslySetInnerHTML={{ __html: currentPost.content }}
+                  />
+                )}
               </Typography>
             </CardContent>
             <CardActions sx={{ paddingTop: "24px" }}>

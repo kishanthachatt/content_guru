@@ -30,9 +30,9 @@ export function ContentCard(props: Props): React.ReactElement {
         title={trimString(props.title, 28)}
       />
       <CardContent sx={{ minHeight: "152px", maxHeight: "152px" }}>
-        <Typography variant="body2" color="text.secondary">
-          {/* {trimString(props.content, 300)} */}
-        </Typography>
+        {props.content && (
+          <div dangerouslySetInnerHTML={{ __html: props.content }} />
+        )}
       </CardContent>
       <CardActions disableSpacing sx={{ justifyContent: "flex-end" }}>
         <Button variant="text" onClick={onViewMoreClick}>

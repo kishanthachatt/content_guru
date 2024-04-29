@@ -25,6 +25,7 @@ import { showSnackbar } from "@/store/snackbar/snackbarSlice";
 import { ContentForm, InsertContentProps as Props } from "./InsertContent.type";
 import { EditorState, ContentState, convertToRaw, Modifier } from "draft-js";
 import { Editor, ContentBlock } from "react-draft-wysiwyg";
+import { stateToHTML } from "draft-js-export-html";
 
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import cn from "./InsertContent.module.scss";
@@ -36,9 +37,7 @@ const InsertContent: React.FC<Props> = (props) => {
   const {
     register,
     handleSubmit,
-    setValue,
     formState: { errors },
-    getValues,
   } = useForm<ContentForm>();
 
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -52,12 +51,13 @@ const InsertContent: React.FC<Props> = (props) => {
 
   const onSubmit: SubmitHandler<ContentForm> = async (data: ContentForm) => {
     setLoading(true);
+    const rawContentState = stateToHTML(editorState.getCurrentContent());
     try {
       const response = await axios.post(
         "/api/content",
         {
           title: data.title,
-          content: editorState,
+          content: rawContentState,
           author: session?.user.id,
         },
         {
@@ -127,8 +127,7 @@ const InsertContent: React.FC<Props> = (props) => {
       anchorOffset: selectionState.getEndOffset(),
       focusOffset: selectionState.getEndOffset(),
     });
-    const newContentText = `\n ${promptMessage}`;
-    // Create a new ContentState with the new content
+    const newContentText = `\n<p> ${promptMessage}<p>`;
     const newContentState = Modifier.insertText(
       existingContentState,
       collapsedSelectionState,
