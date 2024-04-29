@@ -94,7 +94,7 @@ const ContentDetail: React.FC = () => {
 
             <CardContent className={cn.cardContent}>
               <Typography variant="body1">
-                {currentPost.content ?? "SORRY, NO CONTENT TO DISPLAY"}
+                {/* {currentPost.content ?? "SORRY, NO CONTENT TO DISPLAY"} */}
               </Typography>
             </CardContent>
             <CardActions sx={{ paddingTop: "24px" }}>

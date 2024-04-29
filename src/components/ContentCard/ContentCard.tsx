@@ -31,7 +31,7 @@ export function ContentCard(props: Props): React.ReactElement {
       />
       <CardContent sx={{ minHeight: "152px", maxHeight: "152px" }}>
         <Typography variant="body2" color="text.secondary">
-          {trimString(props.content, 300)}
+          {/* {trimString(props.content, 300)} */}
         </Typography>
       </CardContent>
       <CardActions disableSpacing sx={{ justifyContent: "flex-end" }}>

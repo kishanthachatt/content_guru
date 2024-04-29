@@ -5,11 +5,10 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: calc(100vh - 72px);
+  min-height: 100vh;
   overflow: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  // background-color: #ffffff;
   .insertContentCard {
     width: 80%;
     padding: 16px 32px;

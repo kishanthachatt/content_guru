@@ -28,3 +28,26 @@ body {
     text-wrap: balance;
   }
 }
+
+/* React Draft Wysiwyg */
+.rdw-editor-wrapper {
+  border-radius: 5px;
+  border: 1px solid #555555;
+}
+
+.rdw-editor-wrapper {
+  border-radius: 5px !important;
+  border: 1px solid !important;
+}
+
+.rdw-editor-wrapper:focus {
+  border: 1px solid red;
+}
+
+.rdw-editor-toolbar {
+  border-radius: 5px 5px 0px 0px !important;
+}
+
+.DraftEditor-editorContainer {
+  padding: 16.5px 14px;
+}

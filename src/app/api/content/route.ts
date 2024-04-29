@@ -33,7 +33,7 @@ export async function GET(request: {
 export async function POST(request: {
   headers: { get: (arg0: string) => any };
   json: () =>
-    | PromiseLike<{ title: any; content: any; author: any }>
+    | PromiseLike<{ title: string; content: any; author: string }>
     | { title: any; content: any; author: any };
 }) {
   try {
@@ -51,8 +51,9 @@ export async function POST(request: {
     const { title, content, author } = await request.json();
 
     await connectMongoDB();
-
-    await Post.create({ title, content, author });
+    console.log("working 1");
+    let response = await Post.create({ title, content, author });
+    console.log(response, "working 2");
     return NextResponse.json(
       { message: "Post created successfully" },
       { status: 201 }
